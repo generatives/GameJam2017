@@ -16,18 +16,25 @@ public class PlayerMovement : NetworkBehaviour
     public float jumpHeight = 2.0f;
     private bool grounded = false;
     private Rigidbody body;
+
+    private float distToGround;
     
     void Awake()
     {
         body = gameObject.GetComponent<Rigidbody>();
         body.freezeRotation = true;
         body.useGravity = false;
+
+        var collider = gameObject.GetComponent<Collider>();
+        distToGround = collider.bounds.extents.y;
     }
 
     void FixedUpdate()
     {
         if (!isLocalPlayer)
             return;
+
+        grounded = Physics.Raycast(transform.position, -Vector3.up, distToGround + 0.1f);
 
         var maxChange = grounded ? maxVelocityChange : maxAirVelocityChange;
         // Calculate how fast we should be moving
@@ -53,11 +60,6 @@ public class PlayerMovement : NetworkBehaviour
         body.AddForce(new Vector3(0, -gravity * body.mass, 0));
 
         grounded = false;
-    }
-
-    void OnCollisionStay()
-    {
-        grounded = true;
     }
 
     float CalculateJumpVerticalSpeed()

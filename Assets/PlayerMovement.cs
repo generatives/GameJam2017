@@ -1,10 +1,11 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.Networking;
 
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(CapsuleCollider))]
-
-public class PlayerMovement : MonoBehaviour
+public class PlayerMovement : NetworkBehaviour
 {
 
     public float speed = 10.0f;
@@ -25,12 +26,15 @@ public class PlayerMovement : MonoBehaviour
 
     void FixedUpdate()
     {
+        if (!isLocalPlayer)
+            return;
+
         var maxChange = grounded ? maxVelocityChange : maxAirVelocityChange;
         // Calculate how fast we should be moving
         Vector3 targetVelocity = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
         targetVelocity = transform.TransformDirection(targetVelocity);
         targetVelocity *= speed;
-
+        
         // Apply a force that attempts to reach our target velocity
         Vector3 velocity = body.velocity;
         Vector3 velocityChange = (targetVelocity - velocity);

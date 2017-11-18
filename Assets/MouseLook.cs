@@ -31,6 +31,7 @@ public class MouseLook : NetworkBehaviour
                 {
                     camera.transform.SetParent(this.transform);
                     camera.transform.localPosition = Vector3.zero;
+                    camera.transform.localRotation = Quaternion.identity;
                 }
             }
         }

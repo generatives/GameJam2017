@@ -6,6 +6,7 @@ public class Projectile : MonoBehaviour {
 
     public GameObject Source;
     public float MaxLifetime;
+    public float Damage;
 
     private float _lifetime;
 
@@ -13,6 +14,11 @@ public class Projectile : MonoBehaviour {
     {
         if(col.gameObject != Source)
         {
+            var health = col.gameObject.GetComponent<Health>();
+            if(health != null)
+            {
+                health.DoDamage(Damage);
+            }
             Destroy(gameObject);
         }
     }

@@ -8,7 +8,7 @@ using UnityEngine.Networking;
 public class PlayerMovement : NetworkBehaviour
 {
 
-    public float speed = 10.0f;
+    public float speed = 20.0f;
     public float gravity = 10.0f;
     public float maxVelocityChange = 10.0f;
     public float maxAirVelocityChange = 10.0f;
@@ -40,6 +40,7 @@ public class PlayerMovement : NetworkBehaviour
         // Calculate how fast we should be moving
         Vector3 targetVelocity = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
         targetVelocity = transform.TransformDirection(targetVelocity);
+        targetVelocity.Normalize();
         targetVelocity *= speed;
         
         // Apply a force that attempts to reach our target velocity
@@ -60,6 +61,7 @@ public class PlayerMovement : NetworkBehaviour
         body.AddForce(new Vector3(0, -gravity * body.mass, 0));
 
         grounded = false;
+        Debug.Log(body.velocity);
     }
 
     float CalculateJumpVerticalSpeed()

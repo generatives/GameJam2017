@@ -13,18 +13,21 @@ public class MouseLook : NetworkBehaviour
 
     void Start()
     {
-        Vector3 rot = transform.localRotation.eulerAngles;
-        rotY = rot.y;
-        rotX = rot.x;
+        if (isLocalPlayer)
+        {
+            Vector3 rot = transform.localRotation.eulerAngles;
+            rotY = rot.y;
+            rotX = rot.x;
 
-        Cursor.lockState = CursorLockMode.Locked;
+            Cursor.lockState = CursorLockMode.Locked;
+        }
     }
 
     void Update()
     {
-        if (!cameraAttached)
+        if (isLocalPlayer)
         {
-            if (isLocalPlayer)
+            if (!cameraAttached)
             {
                 GameObject camera = GameObject.Find("Camera");
                 if (camera != null)
@@ -34,17 +37,17 @@ public class MouseLook : NetworkBehaviour
                     camera.transform.localRotation = Quaternion.identity;
                 }
             }
+
+            float mouseX = Input.GetAxis("Mouse X");
+            float mouseY = -Input.GetAxis("Mouse Y");
+
+            rotY += mouseX * mouseSensitivity * Time.deltaTime;
+            rotX += mouseY * mouseSensitivity * Time.deltaTime;
+
+            rotX = Mathf.Clamp(rotX, -clampAngle, clampAngle);
+
+            Quaternion localRotation = Quaternion.Euler(rotX, rotY, 0.0f);
+            transform.rotation = localRotation;
         }
-
-        float mouseX = Input.GetAxis("Mouse X");
-        float mouseY = -Input.GetAxis("Mouse Y");
-
-        rotY += mouseX * mouseSensitivity * Time.deltaTime;
-        rotX += mouseY * mouseSensitivity * Time.deltaTime;
-
-        rotX = Mathf.Clamp(rotX, -clampAngle, clampAngle);
-
-        Quaternion localRotation = Quaternion.Euler(rotX, rotY, 0.0f);
-        transform.rotation = localRotation;
     }
 }

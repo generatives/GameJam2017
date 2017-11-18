@@ -1,58 +1,65 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using System.Collections;
 
 [RequireComponent(typeof(Rigidbody))]
-public class PlayerMovement : MonoBehaviour {
+[RequireComponent(typeof(CapsuleCollider))]
 
-    private Rigidbody _body;
+public class PlayerMovement : MonoBehaviour
+{
 
-    public float Speed;
+    public float speed = 10.0f;
+    public float gravity = 10.0f;
+    public float maxVelocityChange = 10.0f;
+    public float maxAirVelocityChange = 10.0f;
+    public bool canJump = true;
+    public float jumpHeight = 2.0f;
+    private bool grounded = false;
+    private Rigidbody body;
+    
+    void Awake()
+    {
+        body = gameObject.GetComponent<Rigidbody>();
+        body.freezeRotation = true;
+        body.useGravity = false;
+    }
 
-	// Use this for initialization
-	void Start () {
-        _body = gameObject.GetComponent<Rigidbody>();
-	}
-	
-	// Update is called once per frame
-	void FixedUpdate () {
+    void FixedUpdate()
+    {
+        var maxChange = grounded ? maxVelocityChange : maxAirVelocityChange;
+        // Calculate how fast we should be moving
+        Vector3 targetVelocity = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
+        targetVelocity = transform.TransformDirection(targetVelocity);
+        targetVelocity *= speed;
 
-        var vector = Vector3.zero;
+        // Apply a force that attempts to reach our target velocity
+        Vector3 velocity = body.velocity;
+        Vector3 velocityChange = (targetVelocity - velocity);
+        velocityChange.x = Mathf.Clamp(velocityChange.x, -maxChange, maxChange);
+        velocityChange.z = Mathf.Clamp(velocityChange.z, -maxChange, maxChange);
+        velocityChange.y = 0;
+        body.AddForce(velocityChange, ForceMode.VelocityChange);
 
-        if (Input.GetKey(KeyCode.A))
+        // Jump
+        if (grounded && canJump && Input.GetButton("Jump"))
         {
-            //Move the Rigidbody to the right constantly at speed you define (the red arrow axis in Scene view)
-            vector += -transform.right;
+            body.velocity = new Vector3(velocity.x, CalculateJumpVerticalSpeed(), velocity.z);
         }
 
-        if (Input.GetKey(KeyCode.D))
-        {
-            //Move the Rigidbody to the left constantly at the speed you define (the red arrow axis in Scene view)
-            vector += transform.right;
-        }
+        // We apply gravity manually for more tuning control
+        body.AddForce(new Vector3(0, -gravity * body.mass, 0));
 
-        var direction = new Vector3(transform.forward.x, 0, transform.forward.z);
-        
-        if (Input.GetKey(KeyCode.W))
-        {
-            //Move the Rigidbody to the right constantly at speed you define (the red arrow axis in Scene view)
-            vector += direction;
-        }
+        grounded = false;
+    }
 
-        if (Input.GetKey(KeyCode.S))
-        {
-            //Move the Rigidbody to the left constantly at the speed you define (the red arrow axis in Scene view)
-            vector += -direction;
-        }
-        vector *= Speed;
+    void OnCollisionStay()
+    {
+        grounded = true;
+    }
 
-        if(vector != Vector3.zero)
-        {
-            _body.AddForce(vector, ForceMode.VelocityChange);
-        }
-        else
-        {
-            _body.velocity = Vector3.zero;
-        }
+    float CalculateJumpVerticalSpeed()
+    {
+        // From the jump height and gravity we deduce the upwards speed 
+        // for the character to reach at the apex.
+        return Mathf.Sqrt(2 * jumpHeight * gravity);
     }
 }

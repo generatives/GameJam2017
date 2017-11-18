@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
 public class ProjectileWeapon : MonoBehaviour {
 
@@ -37,6 +38,8 @@ public class ProjectileWeapon : MonoBehaviour {
 
                     var projectile = obj.GetComponent<Projectile>();
                     projectile.Source = gameObject;
+
+                    NetworkServer.Spawn(obj);
                 }
             }
         }

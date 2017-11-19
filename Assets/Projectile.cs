@@ -20,7 +20,7 @@ public class Projectile : NetworkBehaviour
             var health = col.gameObject.GetComponent<Health>();
             if(health != null)
             {
-                health.DoDamage(Damage);
+                health.TakeDamage(Damage);
             }
             Destroy(gameObject);
         }

@@ -6,8 +6,8 @@ using UnityEngine.Networking;
 public class ProjectileWeapon : NetworkBehaviour
 {
     public GameObject Projectile;
-    public float FiringRate;
-    public float Speed;
+    public float firingRate;
+    public float speed;
 
     [SyncVar]
     public bool IsFiring;
@@ -32,18 +32,24 @@ public class ProjectileWeapon : NetworkBehaviour
 
         if(isServer)
         {
-            if (IsFiring || _lastShotTime != (1 / FiringRate))
+            if (IsFiring || _lastShotTime != (1 / firingRate))
             {
+                Debug.Log("1");
                 _lastShotTime += Time.deltaTime;
-                if (_lastShotTime > (1 / FiringRate))
+
+                Debug.Log(_lastShotTime);
+                Debug.Log((1 / firingRate));
+                if (_lastShotTime > (1 / firingRate))
                 {
+                    Debug.Log("3fesfe");
                     _lastShotTime = 0;
                     if (IsFiring)
                     {
+                        Debug.Log("4fesfe");
                         var obj = Instantiate(Projectile, transform.position, transform.rotation);
-
+                        Debug.Log("5fesfe");
                         var body = obj.GetComponent<Rigidbody>();
-                        body.velocity = transform.forward * Speed;
+                        body.velocity = transform.forward * speed;
 
                         var projectile = obj.GetComponent<Projectile>();
                         projectile.Source = gameObject;
@@ -59,5 +65,11 @@ public class ProjectileWeapon : NetworkBehaviour
     private void CmdSetIsFiring(bool isFiring)
     {
         IsFiring = isFiring;
+    }
+
+    public void UpdateStats(PlayerStats stats)
+    {
+        speed = stats.projectileSpeed;
+        firingRate = stats.projectileRate;
     }
 }

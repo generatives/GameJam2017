@@ -6,20 +6,21 @@ using UnityEngine.Networking;
 public class Health : NetworkBehaviour
 {
     public float MaxHealth;
+    public float healthPerFive;
 
     [SyncVar]
-    public float CurrentHealth;
+    public float currentHealth;
 
     void OnEnable()
     {
-        CurrentHealth = MaxHealth;
+        currentHealth = MaxHealth;
     }
 
     void Update()
     {
         if(isServer)
         {
-            if (CurrentHealth <= 0)
+            if (currentHealth <= 0)
             {
                 var gameManager = GameObject.FindObjectOfType<GameManager>();
                 if (gameManager != null)
@@ -27,11 +28,24 @@ public class Health : NetworkBehaviour
                     gameManager.GameObjectDied(gameObject);
                 }
             }
+            else {
+                currentHealth += healthPerFive * Time.deltaTime / 5f;
+                if (currentHealth >= MaxHealth)
+                {
+                    currentHealth = MaxHealth;
+                }
+            }
         }
     }
 
-    public void DoDamage(float damage)
+    public void TakeDamage(float damage)
     {
-        CurrentHealth -= damage;
+        currentHealth -= damage;
+    }
+
+    public void UpdateStats(PlayerStats stats)
+    {
+        MaxHealth = stats.maxHealth;
+        healthPerFive = stats.healRatePerFive;
     }
 }

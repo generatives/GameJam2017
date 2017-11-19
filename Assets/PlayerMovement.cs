@@ -68,4 +68,11 @@ public class PlayerMovement : NetworkBehaviour
         // for the character to reach at the apex.
         return Mathf.Sqrt(2 * jumpHeight * gravity);
     }
+
+    public void UpdateStats(PlayerStats stats)
+    {
+        speed = stats.moveSpeed;
+        jumpHeight = stats.jumpHeight;
+    }
+
 }

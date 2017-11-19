@@ -13,6 +13,8 @@ public class Projectile : NetworkBehaviour
 
     void OnCollisionEnter(Collision col)
     {
+        if (!isServer) return;
+
         if(col.gameObject != Source)
         {
             var health = col.gameObject.GetComponent<Health>();

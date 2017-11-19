@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public class ProjectileWeapon : MonoBehaviour {
-
+public class ProjectileWeapon : NetworkBehaviour
+{
     public GameObject Projectile;
     public float FiringRate;
     public float Speed;
+
+    [SyncVar]
     public bool IsFiring;
 
     private float _lastShotTime;
@@ -19,29 +21,43 @@ public class ProjectileWeapon : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        IsFiring = Input.GetMouseButton(0);
-
-        if(IsFiring || _lastShotTime != (1 / FiringRate))
+        if(isLocalPlayer)
         {
-            _lastShotTime += Time.deltaTime;
-            if (_lastShotTime > (1 / FiringRate))
+            bool isFiring = Input.GetMouseButton(0);
+            if(isFiring != IsFiring)
             {
-                _lastShotTime = 0;
-                if(IsFiring)
+                CmdSetIsFiring(isFiring);
+            }
+        }
+
+        if(isServer)
+        {
+            if (IsFiring || _lastShotTime != (1 / FiringRate))
+            {
+                _lastShotTime += Time.deltaTime;
+                if (_lastShotTime > (1 / FiringRate))
                 {
-                    var obj = Instantiate(Projectile);
+                    _lastShotTime = 0;
+                    if (IsFiring)
+                    {
+                        var obj = Instantiate(Projectile, transform.position, transform.rotation);
 
-                    obj.transform.position = transform.position;
+                        var body = obj.GetComponent<Rigidbody>();
+                        body.velocity = transform.forward * Speed;
 
-                    var body = obj.GetComponent<Rigidbody>();
-                    body.velocity = transform.forward * Speed;
+                        var projectile = obj.GetComponent<Projectile>();
+                        projectile.Source = gameObject;
 
-                    var projectile = obj.GetComponent<Projectile>();
-                    projectile.Source = gameObject;
-
-                    NetworkServer.Spawn(obj);
+                        NetworkServer.Spawn(obj);
+                    }
                 }
             }
         }
 	}
+
+    [Command]
+    private void CmdSetIsFiring(bool isFiring)
+    {
+        IsFiring = isFiring;
+    }
 }

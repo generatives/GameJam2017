@@ -6,7 +6,7 @@ using UnityEngine.Networking;
 public class GameManager : NetworkBehaviour
 {
     public float RespawnTime;
-
+    
     private List<GameObjectRespawn> _respawns = new List<GameObjectRespawn>();
 
 	// Use this for initialization
@@ -39,17 +39,29 @@ public class GameManager : NetworkBehaviour
 
     private void RespawnGameobj(GameObject obj)
     {
-        var positions = GameObject.FindObjectsOfType<NetworkStartPosition>();
+        var positions = FindObjectsOfType<NetworkStartPosition>();
         var index = Random.Range(0, positions.Length);
         var position = positions[index];
         obj.transform.position = position.transform.position;
-        obj.SetActive(true);
+        NetworkedSetActive(obj, true);
     }
 
     public void GameObjectDied(GameObject obj)
     {
         _respawns.Add(new GameObjectRespawn() { Obj = obj, TimeRemaining = RespawnTime });
-        obj.SetActive(false);
+        NetworkedSetActive(obj, false);
+    }
+
+    void NetworkedSetActive(GameObject obj, bool active)
+    {
+        obj.SetActive(active);
+        RpcSetActive(obj, active);
+    }
+
+    [ClientRpc]
+    void RpcSetActive(GameObject obj, bool active)
+    {
+        obj.SetActive(active);
     }
 
     private class GameObjectRespawn

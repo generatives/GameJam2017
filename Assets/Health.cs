@@ -6,6 +6,8 @@ using UnityEngine.Networking;
 public class Health : NetworkBehaviour
 {
     public float MaxHealth;
+
+    [SyncVar]
     public float CurrentHealth;
 
     void OnEnable()

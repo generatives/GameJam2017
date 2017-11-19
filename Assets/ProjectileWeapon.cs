@@ -9,6 +9,7 @@ public class ProjectileWeapon : NetworkBehaviour
     public float firingRate;
     public float speed;
     public float lifetime;
+    public float damage;
 
     [SyncVar]
     public bool IsFiring;
@@ -31,7 +32,6 @@ public class ProjectileWeapon : NetworkBehaviour
             //}
             if (Input.GetMouseButtonDown(0))
             {
-                Debug.Log("shoot");
                 CmdFire();
             }
         }
@@ -71,9 +71,12 @@ public class ProjectileWeapon : NetworkBehaviour
     private void CmdFire()
     {
         var obj = Instantiate(Projectile, transform.position, transform.rotation);
-        obj.GetComponent<Projectile>().maxLifetime = lifetime;
+        Projectile p = obj.GetComponent<Projectile>();
+        p.maxLifetime = lifetime;
+        p.damage = damage;
+        p.speed = speed;
         var body = obj.GetComponent<Rigidbody>();
-        body.velocity = transform.forward * speed;
+        body.velocity = transform.forward * p.speed;
 
         var projectile = obj.GetComponent<Projectile>();
         projectile.Source = gameObject;
@@ -86,5 +89,6 @@ public class ProjectileWeapon : NetworkBehaviour
         speed = stats.projectileSpeed;
         firingRate = stats.projectileRate;
         lifetime = stats.projectileLife;
+        damage = stats.projectileDamage;
     }
 }

@@ -29,8 +29,6 @@ public class Projectile : NetworkBehaviour
 
     public void Update()
     {
-        Debug.Log(_lifetime);
-        Debug.Log(maxLifetime);
         _lifetime += Time.deltaTime;
         if(_lifetime > maxLifetime)
         {

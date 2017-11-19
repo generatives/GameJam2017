@@ -28,26 +28,23 @@ public class ProjectileWeapon : NetworkBehaviour
             {
                 CmdSetIsFiring(isFiring);
             }
+            if (Input.GetMouseButtonDown(0))
+            {
+                CmdFire();
+            }
         }
 
         if(isServer)
         {
             if (IsFiring || _lastShotTime != (1 / firingRate))
             {
-                Debug.Log("1");
                 _lastShotTime += Time.deltaTime;
-
-                Debug.Log(_lastShotTime);
-                Debug.Log((1 / firingRate));
                 if (_lastShotTime > (1 / firingRate))
                 {
-                    Debug.Log("3fesfe");
                     _lastShotTime = 0;
                     if (IsFiring)
                     {
-                        Debug.Log("4fesfe");
                         var obj = Instantiate(Projectile, transform.position, transform.rotation);
-                        Debug.Log("5fesfe");
                         var body = obj.GetComponent<Rigidbody>();
                         body.velocity = transform.forward * speed;
 
@@ -65,6 +62,19 @@ public class ProjectileWeapon : NetworkBehaviour
     private void CmdSetIsFiring(bool isFiring)
     {
         IsFiring = isFiring;
+    }
+
+    [Command]
+    private void CmdFire()
+    {
+        var obj = Instantiate(Projectile, transform.position, transform.rotation);
+        var body = obj.GetComponent<Rigidbody>();
+        body.velocity = transform.forward * speed;
+
+        var projectile = obj.GetComponent<Projectile>();
+        projectile.Source = gameObject;
+
+        NetworkServer.Spawn(obj);
     }
 
     public void UpdateStats(PlayerStats stats)

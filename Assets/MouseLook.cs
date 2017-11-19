@@ -46,7 +46,9 @@ public class MouseLook : NetworkBehaviour
 
             rotX = Mathf.Clamp(rotX, -clampAngle, clampAngle);
 
-            Quaternion localRotation = Quaternion.Euler(rotX, rotY, 0.0f);
+            Quaternion childRotation = Quaternion.Euler(rotX, rotY, 0.0f);
+            Quaternion localRotation = Quaternion.Euler(0.0f, rotY, 0.0f);
+            transform.GetChild(0).rotation = childRotation;
             transform.rotation = localRotation;
         }
     }

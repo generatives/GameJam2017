@@ -8,6 +8,7 @@ public class ProjectileWeapon : NetworkBehaviour
     public GameObject Projectile;
     public float firingRate;
     public float speed;
+    public float lifetime;
 
     [SyncVar]
     public bool IsFiring;
@@ -24,38 +25,40 @@ public class ProjectileWeapon : NetworkBehaviour
         if(isLocalPlayer)
         {
             bool isFiring = Input.GetMouseButton(0);
-            if(isFiring != IsFiring)
-            {
-                CmdSetIsFiring(isFiring);
-            }
+            //if(isFiring != IsFiring)
+            //{
+            //    CmdSetIsFiring(isFiring);
+            //}
             if (Input.GetMouseButtonDown(0))
             {
+                Debug.Log("shoot");
                 CmdFire();
             }
         }
 
-        if(isServer)
-        {
-            if (IsFiring || _lastShotTime != (1 / firingRate))
-            {
-                _lastShotTime += Time.deltaTime;
-                if (_lastShotTime > (1 / firingRate))
-                {
-                    _lastShotTime = 0;
-                    if (IsFiring)
-                    {
-                        var obj = Instantiate(Projectile, transform.position, transform.rotation);
-                        var body = obj.GetComponent<Rigidbody>();
-                        body.velocity = transform.forward * speed;
+        //if(isServer)
+        //{
+        //    if (IsFiring || _lastShotTime != (1 / firingRate))
+        //    {
+        //        _lastShotTime += Time.deltaTime;
+        //        if (_lastShotTime > (1 / firingRate))
+        //        {
+        //            _lastShotTime = 0;
+        //            if (IsFiring)
+        //            {
+        //                var obj = Instantiate(Projectile, transform.position, transform.rotation);
+        //                var body = obj.GetComponent<Rigidbody>();
+        //                body.AddForce(transform.forward * speed, ForceMode.Impulse);
+        //                //body.velocity = transform.forward * speed;
 
-                        var projectile = obj.GetComponent<Projectile>();
-                        projectile.Source = gameObject;
+        //                var projectile = obj.GetComponent<Projectile>();
+        //                projectile.Source = gameObject;
 
-                        NetworkServer.Spawn(obj);
-                    }
-                }
-            }
-        }
+        //                NetworkServer.Spawn(obj);
+        //            }
+        //        }
+        //    }
+        //}
 	}
 
     [Command]
@@ -68,6 +71,7 @@ public class ProjectileWeapon : NetworkBehaviour
     private void CmdFire()
     {
         var obj = Instantiate(Projectile, transform.position, transform.rotation);
+        obj.GetComponent<Projectile>().maxLifetime = lifetime;
         var body = obj.GetComponent<Rigidbody>();
         body.velocity = transform.forward * speed;
 
@@ -81,5 +85,6 @@ public class ProjectileWeapon : NetworkBehaviour
     {
         speed = stats.projectileSpeed;
         firingRate = stats.projectileRate;
+        lifetime = stats.projectileLife;
     }
 }

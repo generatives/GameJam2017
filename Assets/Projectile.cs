@@ -6,8 +6,9 @@ using UnityEngine.Networking;
 public class Projectile : NetworkBehaviour
 {
     public GameObject Source;
-    public float MaxLifetime;
-    public float Damage;
+    public float maxLifetime;
+    public float damage;
+    public float speed;
 
     private float _lifetime;
 
@@ -20,7 +21,7 @@ public class Projectile : NetworkBehaviour
             var health = col.gameObject.GetComponent<Health>();
             if(health != null)
             {
-                health.TakeDamage(Damage);
+                health.TakeDamage(damage);
             }
             Destroy(gameObject);
         }
@@ -28,8 +29,10 @@ public class Projectile : NetworkBehaviour
 
     public void Update()
     {
+        Debug.Log(_lifetime);
+        Debug.Log(maxLifetime);
         _lifetime += Time.deltaTime;
-        if(_lifetime > MaxLifetime)
+        if(_lifetime > maxLifetime)
         {
             Destroy(gameObject);
         }

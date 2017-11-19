@@ -75,11 +75,9 @@ public class ProjectileWeapon : NetworkBehaviour
         p.maxLifetime = lifetime;
         p.damage = damage;
         p.speed = speed;
+        p.Source = gameObject;
         var body = obj.GetComponent<Rigidbody>();
         body.velocity = transform.forward * p.speed;
-
-        var projectile = obj.GetComponent<Projectile>();
-        projectile.Source = gameObject;
 
         NetworkServer.Spawn(obj);
     }

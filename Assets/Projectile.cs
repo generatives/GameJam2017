@@ -12,7 +12,7 @@ public class Projectile : NetworkBehaviour
 
     private float _lifetime;
 
-    void OnCollisionEnter(Collision col)
+    void OnTriggerEnter(Collider col)
     {
         if (!isServer) return;
 
